@@ -7,15 +7,11 @@
       <div class="card-body">
         <div class="mb-3">
           <label for="">Name</label>
-          <input
-            v-model="model.student.name"
-            type="text"
-            class="form-control"
-          />
+          <input v-model="model.student.product_name" type="text" class="form-control" />
         </div>
         <div class="mb-3">
-          <label for="">Job</label>
-          <input v-model="model.student.job" type="text" class="form-control" />
+          <label for="">Desc</label>
+          <input v-model="model.student.description" type="text" class="form-control" />
         </div>
         <div class="mb-3">
           <button type="button" @click="saveStudent" class="btn btn-primary">
@@ -36,8 +32,8 @@ export default {
     return {
       model: {
         student: {
-          name: "",
-          job: "",
+          product_name: "",
+          description: "",
         },
       },
     };
@@ -45,13 +41,13 @@ export default {
   methods: {
     saveStudent() {
       axios
-        .post("https://reqres.in/api/users", this.model.student)
+        .post("http://localhost:8080/api/product", this.model.student)
         .then((result) => {
           console.log(result.data);
-          alert(result.data);
+          // alert(result.data);
           this.model.student = {
-            name: "",
-            job: "",
+            product_name: "",
+            description: "",
           };
         })
         .catch(function (error) {

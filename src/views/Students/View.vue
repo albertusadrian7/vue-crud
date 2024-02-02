@@ -1,12 +1,85 @@
+<script>
+import axios from "axios";
+import { RouterLink } from "vue-router";
+
+let students = [];
+let model = {
+  student: {
+    product_name: "",
+    description: "",
+  }
+}
+
+export default {
+  name: "students",
+  data() {
+    return {
+      id: "",
+      students: [],
+      model: {
+        student: {
+          product_name: "",
+          description: "",
+        }
+      },
+      isModalVisible: true
+    };
+  },
+  mounted() {
+    // console.log("Test");
+    this.getStudents();
+  },
+  methods: {
+    getStudents() {
+      axios.get("http://localhost:8080/api/products").then((res) => {
+        this.students = res.data.products;
+        // console.log(res.data.products);
+      });
+    },
+    getStudent(id) {
+      this.showModal();
+      axios.get("http://localhost:8080/api/product/" + id).then((res) => {
+        this.model.student = res.data.product;
+        this.id = id;
+        // console.log("ID" + this.id);
+        // console.log(res.data.product);
+      });
+    },
+    updateStudent(id) {
+      axios
+        .put("http://localhost:8080/api/product/" + this.id, this.model.student)
+        .then((result) => {
+          console.log(result.data);
+          this.model.student = {
+            product_name: "",
+            description: "",
+          };
+          this.id = "";
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      $("#formModal").modal("hide");
+    },
+    showModal() {
+      this.isModalVisible = true;
+    },
+    closeModal() {
+      this.isModalVisible = false;
+    }
+  },
+  components: { RouterLink },
+};
+</script>
+
+
 <template>
   <div class="container">
     <div class="card">
       <div class="card-header">
         <h4>
           Students
-          <RouterLink to="/student/create" class="btn btn-primary float-end"
-            >Add Student</RouterLink
-          >
+          <RouterLink to="/student/create" class="btn btn-primary float-end">Add Student</RouterLink>
         </h4>
       </div>
       <div class="card-body">
@@ -14,29 +87,28 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Profile</th>
               <th>Name</th>
-              <th>Email</th>
+              <th>Price</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody v-if="this.students.length > 0">
             <tr v-for="(student, index) in this.students" :key="index">
               <td>{{ student.id }}</td>
-              <td>
+              <!-- <td>
                 <img
                   :src="student.avatar"
                   class="rounded float-left"
                   alt="{{ student.first_name + ' ' + student.last_name }}"
                 />
-              </td>
-              <td>{{ student.first_name + " " + student.last_name }}</td>
-              <td>{{ student.email }}</td>
+              </td> -->
+              <td>{{ student.product_name }}</td>
+              <td>{{ student.description }}</td>
               <td>
-                <RouterLink type class="btn btn-warning float-end" to="/"
-                  >Edit</RouterLink
-                >
-                <button type="button" class="btn btn-danger float-end" to="/">
+                <button @click="showModal" type="button" class="btn btn-primary float-end">
+                  Edit
+                </button>
+                <button type="button" class="btn btn-danger float-end">
                   Delete
                 </button>
               </td>
@@ -51,31 +123,7 @@
       </div>
     </div>
   </div>
+
+  <FormModal></FormModal>
 </template>
 
-<script>
-import axios from "axios";
-import { RouterLink } from "vue-router";
-
-export default {
-  name: "students",
-  data() {
-    return {
-      students: [],
-    };
-  },
-  mounted() {
-    // console.log("Test");
-    this.getStudents();
-  },
-  methods: {
-    getStudents() {
-      axios.get("https://reqres.in/api/users").then((res) => {
-        this.students = res.data.data;
-        console.log(res.data.data);
-      });
-    },
-  },
-  components: { RouterLink },
-};
-</script>
